@@ -3,24 +3,17 @@ package com.sapjilbang.simplehybrid;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class SHWebView extends WebView {
 
@@ -103,57 +96,8 @@ public class SHWebView extends WebView {
             settings.setUserAgentString(userAgent);
         }
 
-        //WebViewClient
-        this.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if(shouldOverrideUrlLoadingCommon(view, url)) {
-                    return false;
-                } else {
-                    return super.shouldOverrideUrlLoading(view, url);
-                }
-            }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                if(shouldOverrideUrlLoadingCommon(view, request.getUrl().toString())) {
-                    return false;
-                } else {
-                    return super.shouldOverrideUrlLoading(view, request);
-                }
-            }
-
-            boolean shouldOverrideUrlLoadingCommon(WebView view, String url) {
-                Uri uri = Uri.parse(url);
-                if(url.startsWith("SH://")) {
-                    if(url.startsWith("SH://init")) {
-                        Gson gson = new Gson();
-                        SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("webData", Context.MODE_PRIVATE);
-                        Map<String, ?> webData = sharedPreferences.getAll();
-                        SharedPreferences sharedPreferences2 = view.getContext().getSharedPreferences("appData", Context.MODE_PRIVATE);
-                        Map<String, ?> appData = sharedPreferences2.getAll();
-                        view.loadUrl("SH://shInitCallBack?webData=" + gson.toJson(webData) + "&appData=" + gson.toJson(appData));
-                    } else if(url.startsWith("SH://data.web")) {
-                        if(uri.getQueryParameter("value") != null) {
-                            SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("webData", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(uri.getQueryParameter("name"), uri.getQueryParameter("value"));
-                            editor.commit();
-                        }
-                    } else if(url.startsWith("SH://data.app")) {
-                        if(uri.getQueryParameter("value") != null) {
-                            SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("appData", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(uri.getQueryParameter("name"), uri.getQueryParameter("value"));
-                            editor.commit();
-                        }
-                    }
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
+        //Add Interface
+        this.addJavascriptInterface(new SHAndroid(this), "SHAndroid");
 
         //WebChromeClient
         this.setWebChromeClient(new WebChromeClient() {
