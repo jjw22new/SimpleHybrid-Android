@@ -13,6 +13,11 @@ public class SHAndroid {
     }
 
     @JavascriptInterface
+    public void init() {
+        appDataToWeb();
+    }
+
+    @JavascriptInterface
     public void appDataToApp(String appData) {
         SharedPreferences sharedPreferences = webView.getContext().getSharedPreferences("SH", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -23,11 +28,11 @@ public class SHAndroid {
     @JavascriptInterface
     public void appDataToWeb() {
         final SharedPreferences sharedPreferences = webView.getContext().getSharedPreferences("SH", Context.MODE_PRIVATE);
-        new Runnable() {
+        webView.post(new Runnable() {
             @Override
             public void run() {
-                webView.loadUrl("javascript:shInitCallBack(" + sharedPreferences.getString("appData", ""));
+                webView.loadUrl("javascript:shInitCallBack('" + sharedPreferences.getString("appData", "") + "')");
             }
-        }.run();
+        });
     }
 }

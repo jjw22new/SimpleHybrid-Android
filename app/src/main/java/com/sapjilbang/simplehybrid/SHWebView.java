@@ -92,7 +92,7 @@ public class SHWebView extends WebView {
         //Webview UserAgent
         String userAgent = settings.getUserAgentString();
         if (!userAgent.contains("SimpleHybrid")) {
-            userAgent = String.format("%s;%s;", settings.getUserAgentString(), "SimpleHybrid");
+            userAgent = String.format("%s;%s;", settings.getUserAgentString(), " SimpleHybrid");
             settings.setUserAgentString(userAgent);
         }
 
